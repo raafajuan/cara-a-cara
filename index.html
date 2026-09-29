@@ -1,0 +1,801 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Cara a Cara Multiverso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700;800&family=Lilita+One&display=swap">
+<style>
+/* Layout: a toy-box table — the player's plastic tray (red or blue) holds a grid of flip-down portrait cards; controls sit above it like the game's lid. */
+:root{
+  --bg:#e6ebf2;
+  --surface:#ffffff;
+  --ink:#1c2230;
+  --muted:#5a6477;
+  --line:#cdd5e1;
+  --red:#d8433a; --red-deep:#9f2c25;
+  --blue:#2f6ad4; --blue-deep:#1c4596;
+  --tray:var(--red); --tray-deep:var(--red-deep);
+  --card:#fbfcfe; --card-ink:#1c2230; --card-muted:#5a6477; --card-edge:#d6dde8;
+  --gold:#f1b531;
+  --ok:#2f9d5a;
+  --shadow:0 1px 2px rgba(20,30,50,.08),0 6px 18px rgba(20,30,50,.08);
+  --font-display:"Lilita One","Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-serif;
+  --font-body:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10141c; --surface:#1a2130; --ink:#e8ecf4; --muted:#9ba6ba; --line:#2b3447;
+  --red:#e0544b; --red-deep:#a3332c; --blue:#3f7ae0; --blue-deep:#234f9e;
+  --card:#f3f5f9; --card-edge:#c7cfdb; --gold:#f3bd45; --ok:#4cb877;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.3);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#10141c; --surface:#1a2130; --ink:#e8ecf4; --muted:#9ba6ba; --line:#2b3447;
+  --red:#e0544b; --red-deep:#a3332c; --blue:#3f7ae0; --blue-deep:#234f9e;
+  --card:#f3f5f9; --card-edge:#c7cfdb; --gold:#f3bd45; --ok:#4cb877;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.3);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.45;padding-inline:16px;padding-block:14px 40px}
+body.tray-blue{--tray:var(--blue);--tray-deep:var(--blue-deep)}
+#app{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--font-display);font-weight:400;letter-spacing:.01em;margin:0;text-wrap:balance}
+h2{font-size:1.35rem}
+h3{font-size:1.15rem}
+p{margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+.btn{appearance:none;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:.6em 1.15em;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:.4em;min-height:42px;transition:transform .12s,background .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--tray);border-color:var(--tray-deep);color:#fff;box-shadow:0 3px 0 var(--tray-deep)}
+.btn.primary:active{box-shadow:0 1px 0 var(--tray-deep)}
+.btn.on{background:var(--gold);border-color:#b8861b;color:#2a1f05}
+.btn.small{min-height:36px;padding:.45em .9em;font-size:.9rem}
+.btn.ghost{background:transparent}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+
+/* ---------- Home ---------- */
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px}
+.brand{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.logo{font-family:var(--font-display);font-size:clamp(2rem,6vw,3.1rem);line-height:1;color:var(--tray);text-shadow:0 3px 0 var(--tray-deep)}
+.tag{font-family:var(--font-display);font-size:1.05rem;background:var(--gold);color:#2a1f05;padding:.15em .55em;border-radius:6px;transform:rotate(-3deg);display:inline-block}
+.tray-pick{display:flex;align-items:center;gap:8px;font-weight:600;color:var(--muted)}
+.swatch{width:38px;height:38px;border-radius:10px;border:3px solid transparent;cursor:pointer;box-shadow:inset 0 -4px 0 rgba(0,0,0,.2)}
+.swatch.red{background:var(--red)}.swatch.blue{background:var(--blue)}
+.swatch[aria-pressed="true"]{border-color:var(--ink)}
+
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.section-head p{color:var(--muted);font-size:.92rem}
+.pack-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.pack{appearance:none;text-align:left;border:2px solid var(--line);background:var(--surface);border-radius:var(--r);padding:12px;cursor:pointer;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow);transition:transform .15s,border-color .15s}
+.pack:hover{transform:translateY(-2px)}
+.pack[aria-pressed="true"]{border-color:var(--tray);box-shadow:0 0 0 3px color-mix(in srgb,var(--tray) 30%,transparent),var(--shadow)}
+.pack-faces{display:flex;background:var(--pack-bg);border-radius:10px;padding:6px 8px 0;height:74px;overflow:hidden}
+.pack-faces svg{width:62px;height:68px;margin-right:-16px;flex:none}
+.pack-name{font-family:var(--font-display);font-size:1.12rem;line-height:1.1}
+.pack-meta{font-size:.8rem;color:var(--muted)}
+.pack-tag{font-size:.84rem;color:var(--muted);line-height:1.3}
+
+.play{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.play-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow);min-width:0}
+.play-card p{color:var(--muted)}
+.join{display:flex;flex-direction:column;gap:6px}
+.join label{font-weight:700;font-size:.9rem}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row input{flex:1 1 150px;min-width:0}
+input[type=text]{font:inherit;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.55em .8em;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);min-height:42px}
+.err{color:var(--red);font-size:.88rem;min-height:1.2em}
+.how ol{margin:0;padding-left:1.3em;display:grid;gap:6px;color:var(--muted);max-width:68ch}
+.how b{color:var(--ink)}
+
+/* ---------- Game ---------- */
+.bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.bar-mid{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+.pack-label{font-family:var(--font-display);font-size:1.25rem}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:.25em .35em .25em .8em;font-weight:700;font-size:.9rem;font-variant-numeric:tabular-nums}
+.chip code{font-family:inherit;letter-spacing:.08em;user-select:all}
+.chip .btn{min-height:28px;padding:.2em .7em;font-size:.8rem}
+.round{font-weight:700;color:var(--muted);font-size:.9rem}
+
+.hud{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;box-shadow:var(--shadow)}
+.secret{appearance:none;border:none;background:none;padding:0;cursor:pointer;width:92px;aspect-ratio:3/4;perspective:600px}
+.secret .inner{position:relative;display:block;width:100%;height:100%;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.3,1.3,.5,1)}
+.secret.open .inner{transform:rotateY(180deg)}
+.secret .s-face{position:absolute;inset:0;border-radius:10px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+.secret .s-back{background:var(--tray-deep);color:#fff;font-weight:700;font-size:.72rem;text-align:center;padding:6px;line-height:1.2;gap:4px;background-image:radial-gradient(rgba(255,255,255,.14) 1.5px,transparent 1.6px);background-size:10px 10px}
+.secret .s-back .q{font-family:var(--font-display);font-size:2rem;line-height:1}
+.secret .s-front{transform:rotateY(180deg);background:var(--card);border:2px solid var(--gold);color:var(--card-ink)}
+.secret .s-front .portrait{width:100%;flex:1;background:var(--pack-bg);display:flex;align-items:flex-end;justify-content:center}
+.secret .s-front svg{width:92%;height:auto}
+.secret .s-front .nm{font-weight:800;font-size:.72rem;padding:3px 4px;text-align:center;line-height:1.1}
+.hud-info{display:flex;flex-direction:column;gap:2px;min-width:0}
+.hud-info .big{font-family:var(--font-display);font-size:1.9rem;line-height:1;font-variant-numeric:tabular-nums}
+.hud-info .big small{font-family:var(--font-body);font-size:.9rem;font-weight:600;color:var(--muted)}
+.hud-info .sub{color:var(--muted);font-size:.88rem}
+.hud-actions{display:flex;flex-direction:column;gap:8px}
+.solo-note{font-size:.85rem;color:var(--muted);max-width:30ch}
+
+.tray{background:var(--tray);border-radius:22px;padding:14px;box-shadow:inset 0 -8px 0 var(--tray-deep),inset 0 3px 0 rgba(255,255,255,.18),var(--shadow)}
+.tray.guessing{outline:4px dashed var(--gold);outline-offset:4px}
+.board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+@media (min-width:640px){.board{grid-template-columns:repeat(6,minmax(0,1fr));gap:11px}}
+@media (min-width:1000px){.board{grid-template-columns:repeat(8,minmax(0,1fr))}}
+.card{appearance:none;border:none;background:none;padding:0;cursor:pointer;aspect-ratio:3/4.1;perspective:700px;display:block;width:100%}
+.card .inner{position:relative;display:block;width:100%;height:100%;transform-style:preserve-3d;transition:transform .42s cubic-bezier(.35,1.25,.5,1)}
+.card.down .inner{transform:rotateX(-180deg)}
+.face{position:absolute;inset:0;border-radius:9px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;display:flex;flex-direction:column}
+.front{background:var(--card);border:2px solid var(--card-edge);color:var(--card-ink);box-shadow:0 3px 0 rgba(0,0,0,.18)}
+.front .portrait{flex:1;min-height:0;background:var(--pack-bg);display:flex;align-items:flex-end;justify-content:center}
+.front svg{width:94%;height:auto;max-height:100%}
+.front .nm{font-weight:800;font-size:clamp(.62rem,1.9vw,.8rem);line-height:1.1;padding:4px 4px 1px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.front .meta{font-size:clamp(.52rem,1.5vw,.66rem);color:var(--card-muted);text-align:center;padding:0 4px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.back{transform:rotateX(180deg);background:var(--tray-deep);border:2px solid rgba(0,0,0,.18);align-items:center;justify-content:center;background-image:radial-gradient(rgba(255,255,255,.13) 1.5px,transparent 1.6px);background-size:9px 9px}
+.back span{font-family:var(--font-display);color:rgba(255,255,255,.55);font-size:1.6rem}
+.card:not(.down):hover .front{border-color:var(--gold)}
+.tray.guessing .card:not(.down) .front{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold)}
+
+.score{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+.score .side{display:flex;align-items:center;gap:8px}
+.score input{width:9ch;text-transform:none;letter-spacing:0;min-height:36px;padding:.35em .6em}
+.score .pts{font-family:var(--font-display);font-size:1.8rem;font-variant-numeric:tabular-nums;min-width:1.4ch;text-align:center}
+.score .x{font-family:var(--font-display);color:var(--muted)}
+.score-label{width:100%;text-align:center;font-size:.82rem;color:var(--muted)}
+
+/* ---------- Dialog ---------- */
+dialog{border:none;border-radius:18px;padding:0;background:var(--surface);color:var(--ink);width:min(560px,calc(100vw - 32px));max-height:min(86vh,760px);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(10,14,22,.55)}
+.dlg{display:flex;flex-direction:column;max-height:inherit}
+.dlg-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 18px 10px}
+.dlg-body{padding:0 18px 18px;overflow:auto;display:flex;flex-direction:column;gap:14px;min-height:0}
+.dlg-foot{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;padding:12px 18px 16px;border-top:1px solid var(--line)}
+.x-btn{appearance:none;border:none;background:var(--bg);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.2rem;line-height:1;color:var(--ink)}
+.qsearch{text-transform:none!important;letter-spacing:0!important;font-weight:600!important;width:100%}
+.qgroup h4{margin:0 0 6px;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.qlist{display:flex;flex-direction:column;gap:6px}
+.q{appearance:none;text-align:left;border:1.5px solid var(--line);background:var(--bg);border-radius:10px;padding:.6em .8em;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:600}
+.q:hover{border-color:var(--tray)}
+.q .split{font-size:.78rem;color:var(--muted);font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.q.useless{opacity:.45}
+.answer-q{font-family:var(--font-display);font-size:1.5rem;text-align:center}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.answers .btn{min-height:64px;font-size:1.1rem;border-radius:14px;flex-direction:column;gap:2px}
+.answers .btn small{font-weight:600;font-size:.78rem;opacity:.85}
+.verdict{font-family:var(--font-display);font-size:2.4rem;text-align:center}
+.verdict.yes{color:var(--ok)}.verdict.no{color:var(--red)}
+.traits{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0}
+.traits dt{color:var(--muted);font-weight:600}
+.traits dd{margin:0;font-weight:700}
+.big-portrait{display:flex;gap:14px;align-items:center}
+.big-portrait .pf{width:110px;flex:none;border-radius:12px;background:var(--pack-bg);border:2px solid var(--gold);overflow:hidden;display:flex;align-items:flex-end}
+.big-portrait .pf svg{width:100%;height:auto}
+.big-portrait h3{font-size:1.5rem}
+.muted{color:var(--muted)}
+
+#toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:.65em 1.1em;border-radius:999px;font-weight:700;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:calc(100vw - 32px);text-align:center;z-index:10}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:560px){
+  .hud{grid-template-columns:auto 1fr;}
+  .hud-actions{grid-column:1 / -1;flex-direction:row;flex-wrap:wrap}
+  .hud-actions .btn{flex:1 1 auto}
+  .secret{width:78px}
+  .tray{padding:10px;border-radius:18px}
+}
+@media (prefers-reduced-motion:reduce){
+  .card .inner,.secret .inner,.btn,.pack{transition:none}
+}
+</style>
+
+<div id="app" aria-live="off"></div>
+<dialog id="dlg" aria-labelledby="dlgTitle"></dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ============================ PALETAS ============================ */
+const SKIN={clara:"#f2cfae",media:"#dca77a",morena:"#b67a4e",escura:"#7b4b2c",palida:"#f6e4d6",verde:"#86b86a",azul:"#71a0d8",cinza:"#9ba3ab",roxa:"#9a78c9",rosa:"#f0a3c4",osso:"#efe9dd",marrom:"#9a6b3d"};
+const HAIR={preto:"#26232b",castanho:"#6d4428",loiro:"#e6c15a",ruivo:"#c4532c",branco:"#ecebf1",grisalho:"#a9a9b1",rosa:"#f09cbd",azul:"#3f7fd6",verde:"#4ca458",roxo:"#8a5cc7",laranja:"#f08a32"};
+const EYES={preto:"#2a2320",castanho:"#6b4423",azul:"#3a86d8",verde:"#3f9a55",cinza:"#8a939c",vermelho:"#cf3b3b",amarelo:"#e0b52f",roxo:"#8c5bd0",rosa:"#e56aa8",branco:"#dcd8ee"};
+const CLOTH={vermelho:"#d2453c",azul:"#3b6fcf",verde:"#3f9d5a",amarelo:"#e8b93a",roxo:"#7f55c2",laranja:"#ee8a33",rosa:"#ea8bb4",preto:"#2d2f38",branco:"#eceef2",cinza:"#8e97a3",marrom:"#86593a"};
+
+/* ============================ EXTENSÕES ============================
+   Cada personagem: [nome, gênero, pele, cor do cabelo, estilo, olhos, acessórios, roupa, ...atributos da extensão] */
+const PACKS=[
+{id:"tra",code:"TRA",name:"Tradicional",tag:"Os 24 rostos clássicos: óculos, chapéus, barbas e bigodes.",bg:"#ffe3a3",attrs:[],chars:[
+["Alice","f","clara","loiro","longo","azul","brinco","rosa"],
+["Bernardo","m","media","castanho","curto","castanho","barba","verde"],
+["Carla","f","escura","preto","coque","castanho","oculos brinco","amarelo"],
+["Davi","m","clara","ruivo","curto","verde","sardas","azul"],
+["Elisa","f","morena","castanho","rabo","castanho","chapeu","vermelho"],
+["Fábio","m","clara","castanho","careca","azul","bigode oculos","cinza"],
+["Gabi","f","clara","rosa","franja","verde","","roxo"],
+["Heitor","m","escura","preto","curto","castanho","chapeu bigode","laranja"],
+["Isabela","f","clara","ruivo","longo","verde","sardas batom","verde"],
+["João","m","morena","preto","espetado","castanho","","vermelho"],
+["Karina","f","media","preto","longo","castanho","oculos batom","azul"],
+["Lucas","m","clara","loiro","franja","azul","","amarelo"],
+["Marina","f","escura","preto","curto","castanho","brinco batom","laranja"],
+["Nelson","m","clara","grisalho","curto","azul","barba oculos","marrom"],
+["Olívia","f","clara","grisalho","coque","azul","oculos","roxo"],
+["Paulo","m","media","castanho","careca","castanho","barba","azul"],
+["Raquel","f","morena","loiro","rabo","castanho","brinco","verde"],
+["Sérgio","m","escura","preto","careca","castanho","oculos","vermelho"],
+["Tânia","f","media","azul","curto","castanho","","preto"],
+["Ulisses","m","clara","castanho","moicano","verde","brinco","preto"],
+["Vera","f","clara","castanho","longo","castanho","chapeu","amarelo"],
+["Wagner","m","clara","ruivo","curto","azul","barba chapeu","verde"],
+["Yara","f","escura","castanho","afro","castanho","brinco","laranja"],
+["Zeca","m","morena","preto","afro","castanho","bigode","amarelo"]]},
+
+{id:"lol",code:"LOL",name:"League of Legends",tag:"Campeões de Runeterra com rota, região e alcance.",bg:"#cfdeec",attrs:["Rota","Região","Alcance"],chars:[
+["Ahri","f","clara","preto","longo","amarelo","orelhasanimal","vermelho","Meio","Ionia","Distância"],
+["Lux","f","clara","loiro","longo","azul","","azul","Meio","Demacia","Distância"],
+["Garen","m","clara","castanho","curto","azul","","azul","Topo","Demacia","Corpo a corpo"],
+["Jinx","f","palida","azul","trancas","rosa","","roxo","Atirador","Zaun","Distância"],
+["Vi","f","clara","rosa","curto","azul","tatuagem","vermelho","Selva","Piltover","Corpo a corpo"],
+["Caitlyn","f","clara","castanho","longo","azul","chapeu","roxo","Atirador","Piltover","Distância"],
+["Yasuo","m","media","castanho","rabo","castanho","cicatriz","azul","Meio","Ionia","Corpo a corpo"],
+["Darius","m","clara","preto","curto","castanho","barba","vermelho","Topo","Noxus","Corpo a corpo"],
+["Katarina","f","clara","ruivo","longo","verde","cicatriz","preto","Meio","Noxus","Corpo a corpo"],
+["Ezreal","m","clara","loiro","franja","azul","","azul","Atirador","Piltover","Distância"],
+["Lee Sin","m","media","preto","careca","castanho","venda","azul","Selva","Ionia","Corpo a corpo"],
+["Ashe","f","clara","branco","longo","azul","capuz","azul","Atirador","Freljord","Distância"],
+["Braum","m","clara","castanho","curto","azul","bigode","vermelho","Suporte","Freljord","Corpo a corpo"],
+["Miss Fortune","f","clara","ruivo","longo","verde","chapeu","vermelho","Atirador","Águas de Sentina","Distância"],
+["Gangplank","m","clara","ruivo","curto","castanho","chapeu barba","vermelho","Topo","Águas de Sentina","Corpo a corpo"],
+["Leona","f","clara","castanho","longo","castanho","","amarelo","Suporte","Targon","Corpo a corpo"],
+["Diana","f","palida","branco","longo","cinza","","roxo","Selva","Targon","Corpo a corpo"],
+["Irelia","f","clara","preto","coque","castanho","","azul","Topo","Ionia","Corpo a corpo"],
+["Akali","f","clara","preto","rabo","castanho","mascara","verde","Meio","Ionia","Corpo a corpo"],
+["Zed","m","clara","preto","careca","vermelho","mascara capacete","preto","Meio","Ionia","Corpo a corpo"],
+["Draven","m","clara","preto","moicano","castanho","bigode","vermelho","Atirador","Noxus","Distância"],
+["Sona","f","clara","azul","trancas","azul","","azul","Suporte","Demacia","Distância"],
+["Twisted Fate","m","clara","castanho","curto","castanho","chapeu bigode","vermelho","Meio","Águas de Sentina","Distância"],
+["Viego","m","palida","branco","longo","verde","coroa","preto","Selva","Ilhas das Sombras","Corpo a corpo"],
+["Senna","f","escura","branco","longo","castanho","","preto","Suporte","Ilhas das Sombras","Distância"],
+["Lucian","m","escura","preto","curto","castanho","barba","branco","Atirador","Demacia","Distância"],
+["Ekko","m","escura","branco","moicano","castanho","tatuagem","verde","Selva","Zaun","Corpo a corpo"],
+["Jayce","m","clara","castanho","curto","azul","","azul","Topo","Piltover","Corpo a corpo"],
+["Qiyana","f","morena","branco","longo","castanho","coroa","verde","Meio","Ixtal","Corpo a corpo"],
+["Taliyah","f","escura","preto","trancas","castanho","","azul","Selva","Shurima","Distância"],
+["Sivir","f","morena","preto","rabo","castanho","coroa","amarelo","Atirador","Shurima","Distância"]]},
+
+{id:"nar",code:"NAR",name:"Naruto",tag:"Ninjas da Folha, da Areia e da Akatsuki.",bg:"#ffd8b6",attrs:["Vila","Grupo"],chars:[
+["Naruto","m","clara","loiro","espetado","azul","bandana marcas","laranja","Folha","Time 7"],
+["Sasuke","m","clara","preto","espetado","preto","","azul","Folha","Time 7"],
+["Sakura","f","clara","rosa","curto","verde","bandana","vermelho","Folha","Time 7"],
+["Kakashi","m","clara","branco","espetado","preto","mascara bandana cicatriz","verde","Folha","Time 7"],
+["Hinata","f","clara","preto","longo","branco","","roxo","Folha","Time 8"],
+["Kiba","m","clara","castanho","espetado","preto","marcas","cinza","Folha","Time 8"],
+["Shino","m","clara","castanho","curto","preto","oculos","verde","Folha","Time 8"],
+["Shikamaru","m","clara","preto","rabo","castanho","brinco","verde","Folha","Time 10"],
+["Ino","f","clara","loiro","rabo","azul","","roxo","Folha","Time 10"],
+["Choji","m","clara","castanho","espetado","preto","marcas","vermelho","Folha","Time 10"],
+["Rock Lee","m","clara","preto","franja","preto","","verde","Folha","Time Guy"],
+["Neji","m","clara","castanho","longo","branco","bandana","branco","Folha","Time Guy"],
+["Tenten","f","clara","castanho","coque","castanho","bandana","rosa","Folha","Time Guy"],
+["Gaara","m","clara","ruivo","curto","verde","tatuagem","vermelho","Areia","Irmãos da Areia"],
+["Temari","f","clara","loiro","coque","verde","bandana","roxo","Areia","Irmãos da Areia"],
+["Kankuro","m","clara","castanho","curto","castanho","capuz tatuagem","preto","Areia","Irmãos da Areia"],
+["Itachi","m","clara","preto","rabo","vermelho","bandana","preto","Folha","Akatsuki"],
+["Kisame","m","azul","azul","espetado","amarelo","bandana","preto","Névoa","Akatsuki"],
+["Deidara","m","clara","loiro","rabo","azul","","preto","Pedra","Akatsuki"],
+["Jiraiya","m","clara","branco","longo","preto","bandana marcas","verde","Folha","Sannin"],
+["Tsunade","f","clara","loiro","trancas","castanho","tatuagem","verde","Folha","Sannin"],
+["Orochimaru","m","palida","preto","longo","amarelo","marcas","branco","Som","Sannin"],
+["Iruka","m","media","castanho","rabo","preto","cicatriz bandana","verde","Folha","Outros"],
+["Zabuza","m","clara","preto","espetado","preto","mascara bandana","cinza","Névoa","Outros"],
+["Minato","m","clara","loiro","espetado","azul","bandana","branco","Folha","Outros"]]},
+
+{id:"hpo",code:"HPO",name:"Harry Potter",tag:"Alunos, professores e bruxos das trevas de Hogwarts.",bg:"#eadcc4",attrs:["Casa","Papel"],chars:[
+["Harry Potter","m","clara","preto","curto","verde","oculos cicatriz","vermelho","Grifinória","Aluno"],
+["Hermione Granger","f","clara","castanho","afro","castanho","","vermelho","Grifinória","Aluno"],
+["Rony Weasley","m","clara","ruivo","curto","azul","sardas","vermelho","Grifinória","Aluno"],
+["Draco Malfoy","m","palida","loiro","curto","cinza","","verde","Sonserina","Aluno"],
+["Neville Longbottom","m","clara","castanho","curto","castanho","","vermelho","Grifinória","Aluno"],
+["Luna Lovegood","f","clara","loiro","longo","azul","brinco","azul","Corvinal","Aluno"],
+["Gina Weasley","f","clara","ruivo","longo","castanho","","vermelho","Grifinória","Aluno"],
+["Fred Weasley","m","clara","ruivo","franja","castanho","sardas","vermelho","Grifinória","Aluno"],
+["Cedrico Diggory","m","clara","castanho","curto","cinza","","amarelo","Lufa-Lufa","Aluno"],
+["Cho Chang","f","clara","preto","longo","castanho","","azul","Corvinal","Aluno"],
+["Alvo Dumbledore","m","clara","branco","longo","azul","oculos barba chapeubruxo","roxo","Grifinória","Professor"],
+["Severo Snape","m","palida","preto","longo","preto","","preto","Sonserina","Professor"],
+["Minerva McGonagall","f","clara","grisalho","coque","verde","oculos chapeubruxo","verde","Grifinória","Professor"],
+["Rúbeo Hagrid","m","media","preto","afro","preto","barba","marrom","Grifinória","Professor"],
+["Remo Lupin","m","clara","castanho","curto","verde","cicatriz bigode","marrom","Grifinória","Professor"],
+["Dolores Umbridge","f","clara","castanho","curto","castanho","laco","rosa","Sonserina","Professor"],
+["Filius Flitwick","m","clara","branco","curto","castanho","bigode","azul","Corvinal","Professor"],
+["Horácio Slughorn","m","clara","grisalho","careca","verde","bigode","verde","Sonserina","Professor"],
+["Lord Voldemort","m","palida","preto","careca","vermelho","","preto","Sonserina","Outro"],
+["Sirius Black","m","clara","preto","longo","cinza","barba","preto","Grifinória","Outro"],
+["Bellatrix Lestrange","f","palida","preto","afro","castanho","","preto","Sonserina","Outro"],
+["Lúcio Malfoy","m","palida","loiro","longo","cinza","","preto","Sonserina","Outro"],
+["Ninfadora Tonks","f","clara","rosa","curto","castanho","","roxo","Lufa-Lufa","Outro"],
+["Molly Weasley","f","clara","ruivo","curto","castanho","","verde","Grifinória","Outro"],
+["Dobby","m","verde","castanho","careca","verde","orelhas","branco","Nenhuma","Outro"]]},
+
+{id:"one",code:"ONE",name:"One Piece",tag:"Piratas, Marinha e Imperadores do mar.",bg:"#cfe7f6",attrs:["Grupo","Akuma no Mi"],chars:[
+["Luffy","m","clara","preto","curto","preto","chapeupalha cicatriz","vermelho","Chapéu de Palha","Sim"],
+["Zoro","m","clara","verde","curto","preto","brinco cicatriz","verde","Chapéu de Palha","Não"],
+["Nami","f","clara","laranja","longo","castanho","","azul","Chapéu de Palha","Não"],
+["Usopp","m","escura","preto","afro","preto","narigao","amarelo","Chapéu de Palha","Não"],
+["Sanji","m","clara","loiro","franja","azul","barba","preto","Chapéu de Palha","Não"],
+["Chopper","m","marrom","castanho","curto","preto","chapeu chifres","rosa","Chapéu de Palha","Sim"],
+["Nico Robin","f","media","preto","longo","azul","","roxo","Chapéu de Palha","Sim"],
+["Franky","m","clara","azul","moicano","preto","oculos","vermelho","Chapéu de Palha","Não"],
+["Brook","m","osso","preto","afro","preto","chapeu","preto","Chapéu de Palha","Sim"],
+["Jinbe","m","azul","preto","curto","preto","","azul","Chapéu de Palha","Não"],
+["Portgas D. Ace","m","clara","preto","curto","preto","chapeu sardas","laranja","Piratas","Sim"],
+["Trafalgar Law","m","clara","preto","curto","cinza","chapeu brinco barba","amarelo","Piratas","Sim"],
+["Boa Hancock","f","clara","preto","longo","azul","brinco","vermelho","Piratas","Sim"],
+["Buggy","m","clara","azul","curto","preto","narigao chapeu","vermelho","Piratas","Sim"],
+["Mihawk","m","clara","preto","curto","amarelo","chapeu bigode barba","preto","Piratas","Não"],
+["Crocodile","m","clara","preto","curto","preto","cicatriz","preto","Piratas","Sim"],
+["Doflamingo","m","clara","loiro","curto","preto","oculos","rosa","Piratas","Sim"],
+["Shanks","m","clara","ruivo","curto","preto","cicatriz","preto","Yonkou","Não"],
+["Barba Branca","m","clara","branco","careca","amarelo","bigode","branco","Yonkou","Sim"],
+["Kaido","m","media","preto","longo","castanho","chifres bigode","roxo","Yonkou","Sim"],
+["Big Mom","f","clara","rosa","afro","castanho","chapeu","vermelho","Yonkou","Sim"],
+["Smoker","m","clara","branco","curto","castanho","cicatriz","branco","Marinha","Sim"],
+["Garp","m","clara","grisalho","curto","preto","barba cicatriz","branco","Marinha","Não"],
+["Koby","m","clara","rosa","curto","preto","","branco","Marinha","Não"]]},
+
+{id:"dbz",code:"DBZ",name:"Dragon Ball",tag:"Saiyajins, androides, deuses e vilões clássicos.",bg:"#ffdfae",attrs:["Raça","Lado"],chars:[
+["Goku","m","clara","preto","espetado","preto","","laranja","Saiyajin","Herói"],
+["Vegeta","m","clara","preto","espetado","preto","","azul","Saiyajin","Herói"],
+["Gohan","m","clara","preto","curto","preto","","roxo","Saiyajin","Herói"],
+["Trunks","m","clara","roxo","franja","azul","","preto","Saiyajin","Herói"],
+["Bardock","m","clara","preto","espetado","preto","cicatriz bandana","verde","Saiyajin","Neutro"],
+["Broly","m","clara","preto","longo","preto","cicatriz","verde","Saiyajin","Vilão"],
+["Raditz","m","clara","preto","longo","preto","","preto","Saiyajin","Vilão"],
+["Nappa","m","clara","preto","careca","preto","bigode","preto","Saiyajin","Vilão"],
+["Piccolo","m","verde","preto","careca","preto","antenas orelhas","roxo","Namekuseijin","Herói"],
+["Dende","m","verde","preto","careca","preto","antenas orelhas","branco","Namekuseijin","Herói"],
+["Kuririn","m","clara","preto","careca","preto","pontos","laranja","Humano","Herói"],
+["Bulma","f","clara","azul","curto","azul","","rosa","Humano","Herói"],
+["Chi-Chi","f","clara","preto","coque","preto","","roxo","Humano","Herói"],
+["Mestre Kame","m","clara","branco","careca","preto","oculos barba bigode","laranja","Humano","Herói"],
+["Yamcha","m","clara","preto","longo","preto","cicatriz","laranja","Humano","Herói"],
+["Tenshinhan","m","clara","preto","careca","preto","terceiroolho","verde","Humano","Herói"],
+["Videl","f","clara","preto","trancas","azul","","branco","Humano","Herói"],
+["Mr. Satan","m","media","preto","afro","castanho","bigode","branco","Humano","Herói"],
+["Androide 18","f","clara","loiro","curto","azul","brinco","azul","Androide","Herói"],
+["Androide 17","m","clara","preto","curto","azul","","laranja","Androide","Herói"],
+["Freeza","m","osso","preto","careca","vermelho","chifres","roxo","Outra","Vilão"],
+["Cell","m","verde","preto","careca","roxo","coroa","preto","Outra","Vilão"],
+["Majin Boo","m","rosa","preto","careca","preto","antenas","roxo","Outra","Vilão"],
+["Bills","m","roxa","preto","careca","amarelo","orelhas","laranja","Outra","Neutro"],
+["Whis","m","azul","branco","moicano","roxo","","roxo","Outra","Neutro"]]},
+
+{id:"mar",code:"MAR",name:"Heróis Marvel",tag:"Vingadores, X-Men, Guardiões e os vilões.",bg:"#f4d2d2",attrs:["Equipe","Poder"],chars:[
+["Homem de Ferro","m","clara","castanho","curto","castanho","barba bigode","vermelho","Vingadores","Tecnologia"],
+["Capitão América","m","clara","loiro","curto","azul","","azul","Vingadores","Superpoder"],
+["Thor","m","clara","loiro","longo","azul","barba","vermelho","Vingadores","Superpoder"],
+["Hulk","m","verde","preto","curto","verde","","roxo","Vingadores","Superpoder"],
+["Viúva Negra","f","clara","ruivo","longo","verde","","preto","Vingadores","Treinamento"],
+["Gavião Arqueiro","m","clara","loiro","curto","azul","","roxo","Vingadores","Treinamento"],
+["Homem-Aranha","m","clara","castanho","curto","castanho","","vermelho","Vingadores","Superpoder"],
+["Pantera Negra","m","escura","preto","curto","castanho","","preto","Vingadores","Superpoder"],
+["Doutor Estranho","m","clara","preto","curto","azul","barba bigode","vermelho","Vingadores","Superpoder"],
+["Feiticeira Escarlate","f","clara","ruivo","longo","verde","coroa","vermelho","Vingadores","Superpoder"],
+["Capitã Marvel","f","clara","loiro","curto","azul","","azul","Vingadores","Superpoder"],
+["Wolverine","m","clara","preto","espetado","castanho","barba","amarelo","X-Men","Superpoder"],
+["Tempestade","f","escura","branco","longo","azul","","preto","X-Men","Superpoder"],
+["Professor X","m","clara","castanho","careca","azul","","cinza","X-Men","Superpoder"],
+["Ciclope","m","clara","castanho","curto","castanho","oculos","azul","X-Men","Superpoder"],
+["Jean Grey","f","clara","ruivo","longo","verde","","verde","X-Men","Superpoder"],
+["Senhor das Estrelas","m","clara","castanho","curto","verde","","vermelho","Guardiões","Treinamento"],
+["Gamora","f","verde","preto","longo","castanho","marcas","preto","Guardiões","Treinamento"],
+["Drax","m","cinza","preto","careca","vermelho","tatuagem","cinza","Guardiões","Treinamento"],
+["Rocket","m","marrom","castanho","curto","castanho","orelhasanimal","laranja","Guardiões","Tecnologia"],
+["Nebulosa","f","azul","preto","careca","preto","cicatriz","preto","Guardiões","Tecnologia"],
+["Magneto","m","clara","branco","curto","azul","capacete","vermelho","Vilões","Superpoder"],
+["Mística","f","azul","ruivo","curto","amarelo","","azul","Vilões","Superpoder"],
+["Thanos","m","roxa","preto","careca","azul","","amarelo","Vilões","Superpoder"],
+["Loki","m","clara","preto","longo","verde","chifres","verde","Vilões","Superpoder"]]}
+];
+PACKS.forEach(p=>{
+  p.list=p.chars.map((a,i)=>({id:p.id+"-"+i,name:a[0],g:a[1],skin:a[2],hair:a[3],style:a[4],eyes:a[5],
+    extras:a[6]?a[6].split(" "):[],cloth:a[7],attrs:Object.fromEntries(p.attrs.map((k,j)=>[k,a[8+j]]))}));
+  p.byId=Object.fromEntries(p.list.map(c=>[c.id,c]));
+});
+const packById=id=>PACKS.find(p=>p.id===id)||PACKS[0];
+const packByCode=code=>PACKS.find(p=>p.code===code);
+
+/* ============================ TEXTOS ============================ */
+const HAIR_NAME={preto:"preto",castanho:"castanho",loiro:"loiro",ruivo:"ruivo",branco:"branco ou prateado",grisalho:"grisalho",rosa:"rosa",azul:"azul",verde:"verde",roxo:"roxo",laranja:"laranja"};
+const STYLE_Q={curto:"Tem cabelo curto?",longo:"Tem cabelo longo e solto?",espetado:"Tem cabelo espetado?",franja:"Tem franja?",rabo:"Usa rabo de cavalo?",coque:"Usa coque?",trancas:"Usa tranças ou maria-chiquinha?",afro:"Tem cabelo volumoso ou cacheado?",moicano:"Tem moicano ou topete?"};
+const STYLE_NAME={curto:"curto",longo:"longo e solto",espetado:"espetado",franja:"com franja",rabo:"rabo de cavalo",coque:"coque",trancas:"tranças",afro:"volumoso",moicano:"moicano"};
+const EYE_NAME={preto:"pretos",castanho:"castanhos",azul:"azuis",verde:"verdes",cinza:"cinza",vermelho:"vermelhos",amarelo:"amarelos",roxo:"roxos",rosa:"rosa",branco:"brancos"};
+const SKIN_Q={verde:"Tem pele verde?",azul:"Tem pele azul?",cinza:"Tem pele cinza?",roxa:"Tem pele roxa?",rosa:"Tem pele rosa?",osso:"Tem pele branca como osso?",marrom:"Tem pelo marrom (bicho)?"};
+const SKIN_NAME={verde:"verde",azul:"azul",cinza:"cinza",roxa:"roxa",rosa:"rosa",osso:"branca como osso",marrom:"pelo marrom"};
+const CLOTH_NAME={vermelho:"vermelha",azul:"azul",verde:"verde",amarelo:"amarela",roxo:"roxa",laranja:"laranja",rosa:"rosa",preto:"preta",branco:"branca",cinza:"cinza",marrom:"marrom"};
+const EXTRA_CAT={chapeupalha:"chapeu",chapeubruxo:"chapeu"};
+const EXTRA_Q={oculos:"Usa óculos?",barba:"Tem barba?",bigode:"Tem bigode?",chapeu:"Usa chapéu?",bandana:"Usa bandana na testa?",mascara:"Usa máscara no rosto?",cicatriz:"Tem cicatriz?",orelhas:"Tem orelhas pontudas?",orelhasanimal:"Tem orelhas de bicho?",chifres:"Tem chifres?",capuz:"Usa capuz?",coroa:"Usa coroa ou tiara?",brinco:"Usa brinco?",batom:"Usa batom?",sardas:"Tem sardas?",marcas:"Tem riscos nas bochechas?",tatuagem:"Tem símbolo ou tatuagem no rosto?",venda:"Usa venda nos olhos?",laco:"Usa laço no cabelo?",narigao:"Tem nariz enorme?",antenas:"Tem antenas?",terceiroolho:"Tem um terceiro olho?",capacete:"Usa capacete?",pontos:"Tem pontos na testa?"};
+const EXTRA_NAME={oculos:"óculos",barba:"barba",bigode:"bigode",chapeu:"chapéu",chapeupalha:"chapéu de palha",chapeubruxo:"chapéu de bruxo",bandana:"bandana na testa",mascara:"máscara",cicatriz:"cicatriz",orelhas:"orelhas pontudas",orelhasanimal:"orelhas de bicho",chifres:"chifres",capuz:"capuz",coroa:"coroa ou tiara",brinco:"brinco",batom:"batom",sardas:"sardas",marcas:"riscos nas bochechas",tatuagem:"símbolo no rosto",venda:"venda nos olhos",laco:"laço",narigao:"nariz enorme",antenas:"antenas",terceiroolho:"terceiro olho",capacete:"capacete",pontos:"pontos na testa"};
+
+/* ============================ RETRATOS ============================ */
+function shade(hex,amt){
+  const n=parseInt(hex.slice(1),16);let r=n>>16,g=n>>8&255,b=n&255;
+  const f=v=>Math.max(0,Math.min(255,Math.round(amt<0?v*(1+amt):v+(255-v)*amt)));
+  return "#"+[f(r),f(g),f(b)].map(v=>v.toString(16).padStart(2,"0")).join("");
+}
+function avatar(c){
+  const skin=SKIN[c.skin]||SKIN.clara, skinD=shade(skin,-.2);
+  const hair=HAIR[c.hair]||HAIR.preto;
+  const bald=c.style==="careca";
+  const eye=EYES[c.eyes]||EYES.preto;
+  const cloth=CLOTH[c.cloth]||CLOTH.cinza;
+  const x=new Set(c.extras);
+  const brow=bald?shade(skin,-.5):shade(hair,-.12);
+  const covered=x.has("capuz")||x.has("capacete");
+  let s='<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">';
+  // cabelo de trás
+  if(!bald&&!covered){
+    const cap=`<path d="M26,48 Q23,17 50,16 Q77,17 74,48Z" fill="${hair}"/>`;
+    if(c.style==="longo") s+=`<path d="M26,44 Q23,17 50,16 Q77,17 74,44 L79,86 Q64,92 50,90 Q36,92 21,86Z" fill="${hair}"/>`;
+    else if(c.style==="afro") s+=`<circle cx="50" cy="41" r="31" fill="${hair}"/>`;
+    else if(c.style==="trancas") s+=cap+`<ellipse cx="23" cy="67" rx="7" ry="17" fill="${hair}"/><ellipse cx="77" cy="67" rx="7" ry="17" fill="${hair}"/>`;
+    else if(c.style==="rabo") s+=cap+`<path d="M68,28 Q90,34 85,62 Q83,78 74,83 Q79,60 66,40Z" fill="${hair}"/>`;
+    else if(c.style==="coque") s+=cap+`<circle cx="50" cy="15" r="10" fill="${hair}"/>`;
+  }
+  // corpo e pescoço
+  s+=`<path d="M13,100 Q15,79 50,77 Q85,79 87,100Z" fill="${cloth}"/>`;
+  s+=`<path d="M43,66 L57,66 L58,80 Q50,84 42,80Z" fill="${skinD}"/>`;
+  // orelhas
+  if(x.has("orelhas")) s+=`<path d="M29,49 L10,33 L28,61Z" fill="${skin}"/><path d="M71,49 L90,33 L72,61Z" fill="${skin}"/>`;
+  else s+=`<ellipse cx="27" cy="54" rx="4.5" ry="6" fill="${skinD}"/><ellipse cx="73" cy="54" rx="4.5" ry="6" fill="${skinD}"/>`;
+  // cabeça
+  s+=`<ellipse cx="50" cy="50" rx="23" ry="26" fill="${skin}"/>`;
+  s+=`<circle cx="35" cy="62" r="4" fill="#ff6b6b" opacity=".14"/><circle cx="65" cy="62" r="4" fill="#ff6b6b" opacity=".14"/>`;
+  if(x.has("sardas")) s+=[[34,60],[37,62],[33,63.5],[66,60],[63,62],[67,63.5]].map(([a,b])=>`<circle cx="${a}" cy="${b}" r=".9" fill="#a2573a"/>`).join("");
+  if(x.has("marcas")) s+=[58,61.5,65].map(y=>`<path d="M30,${y} L38,${y+.6}M62,${y+.6} L70,${y}" stroke="#6e3a2e" stroke-width="1.3" stroke-linecap="round"/>`).join("");
+  if(x.has("tatuagem")) s+=`<path d="M34,56 L37.5,60.5 L34,65 L30.5,60.5Z" fill="#b4306a"/>`;
+  if(x.has("pontos")) s+=[[44,31],[50,30],[56,31],[44,36],[50,35],[56,36]].map(([a,b])=>`<circle cx="${a}" cy="${b}" r="1.1" fill="#7a4a3a"/>`).join("");
+  if(x.has("terceiroolho")) s+=`<ellipse cx="50" cy="38" rx="3.8" ry="2.6" fill="#fff"/><circle cx="50" cy="38" r="1.7" fill="${eye}"/>`;
+  // olhos
+  if(!x.has("venda")){
+    s+=`<ellipse cx="41" cy="53" rx="5" ry="4.2" fill="#fff"/><ellipse cx="59" cy="53" rx="5" ry="4.2" fill="#fff"/>`;
+    if(c.eyes==="branco") s+=`<circle cx="41" cy="53" r="3" fill="${eye}"/><circle cx="59" cy="53" r="3" fill="${eye}"/>`;
+    else s+=`<circle cx="41.3" cy="53.3" r="2.7" fill="${eye}"/><circle cx="59.3" cy="53.3" r="2.7" fill="${eye}"/><circle cx="41.4" cy="53.4" r="1.2" fill="#18181c"/><circle cx="59.4" cy="53.4" r="1.2" fill="#18181c"/><circle cx="42.3" cy="52.4" r=".7" fill="#fff"/><circle cx="60.3" cy="52.4" r=".7" fill="#fff"/>`;
+  }
+  // boca, nariz, barba
+  const masked=x.has("mascara");
+  if(!masked){
+    if(x.has("barba")) s+=`<path d="M27,55 Q26,82 50,84 Q74,82 73,55 Q71,71 61,70 Q50,75 39,70 Q29,71 27,55Z" fill="${hair}"/>`;
+    if(x.has("narigao")) s+=`<path d="M49,54 Q51,56 71,58 Q73.5,60 70,61.5 Q55,62.5 49,62Z" fill="${skinD}"/>`;
+    else s+=`<path d="M50,54 Q47.5,60.5 51,61" stroke="${skinD}" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
+    if(x.has("batom")) s+=`<path d="M44,67 Q50,64.5 56,67 Q50,71.5 44,67Z" fill="#c23350"/>`;
+    else s+=`<path d="M44.5,67 Q50,71 55.5,67" stroke="#7b3a30" stroke-width="1.8" fill="none" stroke-linecap="round"/>`;
+    if(x.has("bigode")) s+=`<path d="M41.5,64.5 Q46,60.5 50,62.6 Q54,60.5 58.5,64.5 Q54,66.4 50,65 Q46,66.4 41.5,64.5Z" fill="${hair}"/>`;
+  }
+  if(x.has("cicatriz")) s+=`<path d="M38,44 L43,63" stroke="#b25a4f" stroke-width="1.6" stroke-linecap="round"/><path d="M38.5,50 L42.5,49 M39.8,56 L43.6,55" stroke="#b25a4f" stroke-width="1.2" stroke-linecap="round"/>`;
+  // cabelo da frente
+  if(!bald&&!covered){
+    const F={
+      curto:"M27,50 Q25,22 50,21 Q75,22 73,50 Q71,37 62,34 Q52,40 42,34 Q30,37 27,50Z",
+      longo:"M27,56 Q24,19 50,19 Q76,19 73,56 Q71,34 50,30 Q29,34 27,56Z",
+      trancas:"M27,56 Q24,19 50,19 Q76,19 73,56 Q71,34 50,30 Q29,34 27,56Z",
+      rabo:"M27,50 Q25,21 50,20 Q75,21 73,50 Q69,31 50,30 Q31,31 27,50Z",
+      coque:"M27,50 Q25,21 50,20 Q75,21 73,50 Q69,31 50,30 Q31,31 27,50Z",
+      franja:"M26,54 Q24,20 50,19 Q76,20 74,54 L72,45 Q61,48 50,45 Q39,48 28,45Z",
+      espetado:"M25,52 L19,31 L31,33 L27,13 L41,24 L47,6 L55,22 L65,7 L66,26 L79,16 L73,34 L83,32 L75,52 Q70,36 50,33 Q30,36 25,52Z",
+      afro:"M27,49 Q28,25 50,24 Q72,25 73,49 Q64,35 50,35 Q36,35 27,49Z",
+      moicano:"M45,38 Q43,9 50,5 Q57,9 55,38 Q50,33 45,38Z"
+    };
+    if(F[c.style]) s+=`<path d="${F[c.style]}" fill="${hair}"/>`;
+  }
+  if(!x.has("venda")) s+=`<path d="M35.5,46.5 Q41,43.5 46,45.5" stroke="${brow}" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M54,45.5 Q59,43.5 64.5,46.5" stroke="${brow}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+  // acessórios
+  if(x.has("venda")) s+=`<rect x="25" y="47.5" width="50" height="10" rx="3" fill="#b8322c"/>`;
+  if(x.has("oculos")) s+=`<g fill="rgba(255,255,255,.18)" stroke="#1f2430" stroke-width="1.8"><circle cx="41" cy="53" r="6.5"/><circle cx="59" cy="53" r="6.5"/></g><path d="M47.5,53 L52.5,53" stroke="#1f2430" stroke-width="1.8"/>`;
+  if(masked) s+=`<path d="M27,57 Q28,79 50,78 Q72,79 73,57 Q62,61 50,60 Q38,61 27,57Z" fill="#39414f"/>`;
+  if(x.has("capacete")) s+=`<path d="M23,58 Q21,13 50,12 Q79,13 77,58 L70,58 Q70,33 50,32 Q30,33 30,58Z" fill="${shade(cloth,-.1)}"/>`;
+  if(x.has("capuz")) s+=`<path d="M18,66 Q16,12 50,11 Q84,12 82,66 L75,63 Q75,27 50,26 Q25,27 25,63Z" fill="${shade(cloth,-.12)}"/>`;
+  if(x.has("bandana")) s+=`<rect x="26" y="33" width="48" height="7" rx="2" fill="#2d3a58"/><rect x="41" y="33.5" width="18" height="6" rx="1.5" fill="#cfd5dd" stroke="#8a95a5" stroke-width=".8"/>`;
+  if(x.has("chapeu")){const h=shade(cloth,-.15);s+=`<ellipse cx="50" cy="29" rx="33" ry="6.5" fill="${h}"/><path d="M31,29 Q31,7 50,7 Q69,7 69,29Z" fill="${h}"/><rect x="31" y="22" width="38" height="5" fill="${shade(h,-.35)}"/>`;}
+  if(x.has("chapeupalha")) s+=`<ellipse cx="50" cy="29" rx="34" ry="7" fill="#e9c56a"/><path d="M31,29 Q31,8 50,8 Q69,8 69,29Z" fill="#e9c56a"/><rect x="31" y="21.5" width="38" height="5" fill="#c8392f"/>`;
+  if(x.has("chapeubruxo")){const h=shade(cloth,-.1);s+=`<ellipse cx="50" cy="29" rx="32" ry="6" fill="${h}"/><path d="M33,29 Q48,12 61,-4 Q62,12 67,29Z" fill="${h}"/>`;}
+  if(x.has("coroa")) s+=`<path d="M33,27 L33,13 L41,20 L50,9 L59,20 L67,13 L67,27Z" fill="#e7b93c" stroke="#b8871f" stroke-width="1"/>`;
+  if(x.has("chifres")) s+=`<path d="M33,31 Q22,20 20,5 Q31,13 39,26Z" fill="#e9dfc8" stroke="#b9ab8c" stroke-width=".8"/><path d="M67,31 Q78,20 80,5 Q69,13 61,26Z" fill="#e9dfc8" stroke="#b9ab8c" stroke-width=".8"/>`;
+  if(x.has("antenas")) s+=`<path d="M44,27 Q40,15 36,8M56,27 Q60,15 64,8" stroke="${skinD}" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="36" cy="8" r="3" fill="${skinD}"/><circle cx="64" cy="8" r="3" fill="${skinD}"/>`;
+  if(x.has("orelhasanimal")){const e=bald?skinD:hair;s+=`<path d="M29,34 L25,8 L44,24Z" fill="${e}"/><path d="M71,34 L75,8 L56,24Z" fill="${e}"/><path d="M31,29 L29,15 L39,24Z" fill="#f3b6c6"/><path d="M69,29 L71,15 L61,24Z" fill="#f3b6c6"/>`;}
+  if(x.has("laco")) s+=`<path d="M66,21 L56,14 L56,28Z M66,21 L76,14 L76,28Z" fill="#e45f9a"/><circle cx="66" cy="21" r="3" fill="#c23f7c"/>`;
+  if(x.has("brinco")) s+=`<circle cx="27" cy="61.5" r="2.2" fill="#e7b93c"/><circle cx="73" cy="61.5" r="2.2" fill="#e7b93c"/>`;
+  return s+"</svg>";
+}
+
+/* ============================ SORTEIO ============================ */
+function seedFrom(str){let h=1779033703^str.length;for(let i=0;i<str.length;i++){h=Math.imul(h^str.charCodeAt(i),3432918353);h=h<<13|h>>>19}h=Math.imul(h^h>>>16,2246822507);h=Math.imul(h^h>>>13,3266489909);return (h^h>>>16)>>>0}
+function rng(seed){let a=seed;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function shuffled(arr,seedStr){const r=rng(seedFrom(seedStr)),a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const CODE_CHARS="ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+function newCode(pack){let s="";for(let i=0;i<4;i++)s+=CODE_CHARS[Math.floor(Math.random()*CODE_CHARS.length)];return pack.code+"-"+s}
+function parseCode(raw){
+  const t=String(raw||"").toUpperCase().replace(/[^A-Z0-9]/g,"");
+  const m=t.match(/^([A-Z]{3})([A-Z0-9]{4})$/);
+  if(!m) return null;
+  const pack=packByCode(m[1]);
+  return pack?{pack,code:m[1]+"-"+m[2]}:null;
+}
+const BOARD_SIZE=24;
+
+/* ============================ ESTADO ============================ */
+const KEY="cac.v1";
+const store={get(){try{return JSON.parse(localStorage.getItem(KEY)||"null")}catch(e){return null}},set(v){try{localStorage.setItem(KEY,JSON.stringify(v))}catch(e){}}};
+function fresh(){return{screen:"home",packId:"tra",tray:"red",mode:null,code:null,round:1,board:[],down:[],secret:null,ai:null,asked:0,guessing:false,reveal:false,score:{me:0,them:0,meName:"Você",themName:"Oponente"}}}
+let S;
+
+function save(){store.set(S)}
+function pack(){return packById(S.packId)}
+function char(id){return pack().byId[id]}
+function standing(){const d=new Set(S.down);return S.board.filter(id=>!d.has(id))}
+
+function startGame(mode,code){
+  const p=parseCode(code).pack;
+  Object.assign(S,{screen:"game",mode,code,packId:p.id,round:1});
+  buildRound();
+}
+function buildRound(){
+  const p=pack();
+  S.board=shuffled(p.list.map(c=>c.id),S.code+"#"+S.round).slice(0,BOARD_SIZE);
+  S.down=[];S.asked=0;S.guessing=false;S.reveal=false;
+  S.secret=S.board[Math.floor(Math.random()*S.board.length)];
+  S.ai=S.mode==="solo"?S.board[Math.floor(Math.random()*S.board.length)]:null;
+  save();render();
+}
+
+/* ============================ PERGUNTAS ============================ */
+function questions(){
+  const p=pack(),cs=S.board.map(id=>p.byId[id]),qs=[];
+  const add=(group,label,test)=>{const n=cs.filter(test).length;if(n>0&&n<cs.length)qs.push({key:group+"|"+label,group,label,test})};
+  add("Pessoa","É homem?",c=>c.g==="m");
+  for(const k in SKIN_Q) add("Pessoa",SKIN_Q[k],c=>c.skin===k);
+  add("Cabelo","É careca?",c=>c.style==="careca");
+  for(const k in HAIR_NAME) add("Cabelo",`Tem cabelo ${HAIR_NAME[k]}?`,c=>c.style!=="careca"&&c.hair===k);
+  for(const k in STYLE_Q) add("Cabelo",STYLE_Q[k],c=>c.style===k);
+  for(const k in EYE_NAME) add("Olhos",`Tem olhos ${EYE_NAME[k]}?`,c=>c.eyes===k);
+  const cat=e=>EXTRA_CAT[e]||e;
+  for(const k in EXTRA_Q) add("Rosto e acessórios",EXTRA_Q[k],c=>c.extras.some(e=>cat(e)===k));
+  for(const k in CLOTH_NAME) add("Roupa",`Veste roupa ${CLOTH_NAME[k]}?`,c=>c.cloth===k);
+  p.attrs.forEach(a=>{[...new Set(p.list.map(c=>c.attrs[a]))].forEach(v=>add(p.name,`${a}: ${v}?`,c=>c.attrs[a]===v))});
+  return qs;
+}
+function traitRows(c){
+  const p=pack(),rows=[["Gênero",c.g==="m"?"Homem":"Mulher"]];
+  if(SKIN_NAME[c.skin]) rows.push(["Pele",SKIN_NAME[c.skin]]);
+  rows.push(["Cabelo",c.style==="careca"?"careca":`${HAIR_NAME[c.hair]}, ${STYLE_NAME[c.style]}`]);
+  rows.push(["Olhos",c.extras.includes("venda")?"cobertos pela venda":EYE_NAME[c.eyes]]);
+  rows.push(["No rosto",c.extras.length?c.extras.map(e=>EXTRA_NAME[e]).join(", "):"nada"]);
+  rows.push(["Roupa",CLOTH_NAME[c.cloth]]);
+  p.attrs.forEach(a=>rows.push([a,c.attrs[a]]));
+  return rows;
+}
+
+/* ============================ RENDER ============================ */
+const app=document.getElementById("app"),dlg=document.getElementById("dlg"),toastEl=document.getElementById("toast");
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+let toastT;
+function toast(msg){toastEl.textContent=msg;toastEl.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>toastEl.classList.remove("show"),2600)}
+
+function render(){
+  document.body.classList.toggle("tray-blue",S.tray==="blue");
+  app.innerHTML=S.screen==="game"?gameView():homeView();
+}
+
+function homeView(){
+  const sel=pack();
+  return `
+  <header class="top">
+    <div class="brand"><h1 class="logo">Cara a Cara</h1><span class="tag">Multiverso</span></div>
+    <div class="tray-pick" role="group" aria-label="Cor do seu tabuleiro">Seu tabuleiro
+      <button class="swatch red" data-act="tray" data-v="red" aria-pressed="${S.tray==="red"}" aria-label="Vermelho"></button>
+      <button class="swatch blue" data-act="tray" data-v="blue" aria-pressed="${S.tray==="blue"}" aria-label="Azul"></button>
+    </div>
+  </header>
+  <section>
+    <div class="section-head"><h2>Escolha a extensão</h2><p>Cada partida sorteia 24 personagens da extensão.</p></div>
+    <div class="pack-grid">${PACKS.map(p=>`
+      <button class="pack" data-act="pack" data-id="${p.id}" aria-pressed="${p.id===sel.id}" style="--pack-bg:${p.bg}">
+        <span class="pack-faces">${p.list.slice(0,4).map(avatar).join("")}</span>
+        <span class="pack-name">${esc(p.name)}</span>
+        <span class="pack-tag">${esc(p.tag)}</span>
+        <span class="pack-meta">${p.list.length} personagens</span>
+      </button>`).join("")}
+    </div>
+  </section>
+  <section class="play">
+    <div class="play-card">
+      <h3>Jogar a dois</h3>
+      <p>Cada um abre esta página no próprio celular ou PC. Um cria a partida e passa o código, o outro digita. Os dois recebem o mesmo tabuleiro.</p>
+      <button class="btn primary" data-act="create">Criar partida de ${esc(sel.name)}</button>
+      <form class="join" id="joinForm" autocomplete="off">
+        <label for="codeInput">Recebeu um código?</label>
+        <div class="row"><input type="text" id="codeInput" placeholder="LOL-K7Q2" maxlength="9" inputmode="text" autocapitalize="characters" spellcheck="false"><button class="btn" type="submit">Entrar</button></div>
+        <p class="err" id="joinErr"></p>
+      </form>
+    </div>
+    <div class="play-card">
+      <h3>Treinar sozinho</h3>
+      <p>O computador escolhe um personagem secreto e responde suas perguntas. Tente descobrir quem é usando o mínimo de perguntas.</p>
+      <button class="btn" data-act="solo">Treinar com ${esc(sel.name)}</button>
+    </div>
+  </section>
+  <section class="how">
+    <div class="section-head"><h2>Como jogar a dois</h2></div>
+    <ol>
+      <li><b>Criem a partida</b> com o mesmo código. Cada aparelho sorteia um personagem secreto diferente.</li>
+      <li><b>Revezem perguntas de sim ou não</b> em voz alta, por chamada ou mensagem: "Seu personagem usa chapéu?"</li>
+      <li><b>Baixem as cartas</b> que não batem, tocando nelas ou usando o botão Perguntar, que baixa sozinho.</li>
+      <li><b>Quem adivinhar primeiro vence</b> a rodada. Marquem o placar e toquem em Nova rodada nos dois aparelhos.</li>
+    </ol>
+  </section>`;
+}
+
+function gameView(){
+  const p=pack(),solo=S.mode==="solo",up=standing().length,sec=char(S.secret),downSet=new Set(S.down);
+  return `
+  <header class="bar">
+    <button class="btn ghost small" data-act="home">← Início</button>
+    <div class="bar-mid">
+      <span class="pack-label">${esc(p.name)}</span>
+      ${solo?`<span class="round">Treino</span>`:`<span class="chip">Código <code id="codeText">${S.code}</code><button class="btn small" data-act="copy">Copiar</button></span><span class="round">Rodada ${S.round}</span>`}
+    </div>
+    <button class="btn small" data-act="${solo?"newsolo":"newround"}">${solo?"Novo treino":"Nova rodada"}</button>
+  </header>
+  <section class="hud" style="--pack-bg:${p.bg}">
+    ${solo?`<div class="secret" aria-hidden="true"><span class="inner"><span class="s-face s-back"><span class="q">?</span>Computador</span></span></div>`:
+    `<button class="secret ${S.reveal?"open":""}" data-act="reveal" aria-label="${S.reveal?"Esconder":"Mostrar"} seu personagem">
+      <span class="inner">
+        <span class="s-face s-back"><span class="q">?</span>Seu personagem<br>toque para ver</span>
+        <span class="s-face s-front"><span class="portrait">${avatar(sec)}</span><span class="nm">${esc(sec.name)}</span></span>
+      </span></button>`}
+    <div class="hud-info">
+      <div class="big">${up} <small>de ${S.board.length} de pé</small></div>
+      <div class="sub">${S.asked} ${S.asked===1?"pergunta":"perguntas"}${solo?" · "+(S.guessing?"toque na carta do seu chute":"descubra o personagem do computador"):""}</div>
+    </div>
+    <div class="hud-actions">
+      <button class="btn primary" data-act="ask">Perguntar</button>
+      ${solo?`<button class="btn ${S.guessing?"on":""}" data-act="guess" aria-pressed="${S.guessing}">${S.guessing?"Cancelar chute":"Chutar"}</button>`:`<button class="btn" data-act="details">Ficha do meu</button>`}
+    </div>
+  </section>
+  <div class="tray ${S.guessing?"guessing":""}" style="--pack-bg:${p.bg}">
+    <div class="board">${S.board.map(id=>{const c=p.byId[id],d=downSet.has(id);const meta=p.attrs.slice(0,2).map(a=>c.attrs[a]).join(" · ");return `
+      <button class="card ${d?"down":""}" data-act="card" data-id="${id}" aria-pressed="${d}" aria-label="${esc(c.name)}${d?" (baixada)":""}">
+        <span class="inner">
+          <span class="face front"><span class="portrait">${avatar(c)}</span><span class="nm">${esc(c.name)}</span>${meta?`<span class="meta">${esc(meta)}</span>`:""}</span>
+          <span class="face back"><span>?</span></span>
+        </span></button>`}).join("")}
+    </div>
+  </div>
+  ${solo?"":`<section class="score" aria-label="Placar">
+    <div class="side"><input type="text" id="meName" value="${esc(S.score.meName)}" maxlength="12" aria-label="Seu nome"><button class="btn small" data-act="pt" data-v="me" aria-label="Ponto para ${esc(S.score.meName)}">+1</button></div>
+    <span class="pts">${S.score.me}</span><span class="x">×</span><span class="pts">${S.score.them}</span>
+    <div class="side"><button class="btn small" data-act="pt" data-v="them" aria-label="Ponto para ${esc(S.score.themName)}">+1</button><input type="text" id="themName" value="${esc(S.score.themName)}" maxlength="12" aria-label="Nome do oponente"></div>
+    <span class="score-label">Placar deste aparelho · <button class="btn ghost small" data-act="resetscore">zerar</button></span>
+  </section>`}`;
+}
+
+/* ============================ DIÁLOGOS ============================ */
+function openDialog(title,body,foot=""){
+  dlg.innerHTML=`<div class="dlg"><div class="dlg-head"><h2 id="dlgTitle">${title}</h2><button class="x-btn" data-act="close" aria-label="Fechar">×</button></div><div class="dlg-body">${body}</div>${foot?`<div class="dlg-foot">${foot}</div>`:""}</div>`;
+  if(!dlg.open) dlg.showModal();
+}
+function closeDialog(){if(dlg.open)dlg.close()}
+
+let QS=[],curQ=null;
+function openAsk(){
+  QS=questions();
+  const up=standing().map(char);
+  const groups=[...new Set(QS.map(q=>q.group))];
+  const body=`<input type="text" class="qsearch" id="qsearch" placeholder="Buscar pergunta (ex.: chapéu, loiro, Ionia)" aria-label="Buscar pergunta">
+  ${groups.map(g=>`<div class="qgroup" data-g="${esc(g)}"><h4>${esc(g)}</h4><div class="qlist">${QS.filter(q=>q.group===g).map(q=>{
+    const yes=up.filter(q.test).length,no=up.length-yes,useless=yes===0||no===0;
+    return `<button class="q ${useless?"useless":""}" data-act="q" data-k="${esc(q.key)}"><span>${esc(q.label)}</span><span class="split">${useless?"não ajuda":`sim ${yes} · não ${no}`}</span></button>`}).join("")}</div></div>`).join("")}`;
+  openDialog(S.mode==="solo"?"Perguntar ao computador":"O que você perguntou?",body);
+}
+function pickQuestion(key){
+  curQ=QS.find(q=>q.key===key);if(!curQ)return;
+  const up=standing().map(char),yes=up.filter(curQ.test).length,no=up.length-yes;
+  if(S.mode==="solo"){
+    const ans=curQ.test(char(S.ai));
+    const n=applyAnswer(curQ,ans);
+    openDialog("Resposta do computador",`<p class="answer-q">${esc(curQ.label)}</p><p class="verdict ${ans?"yes":"no"}">${ans?"Sim":"Não"}</p><p class="muted" style="text-align:center">${n} ${n===1?"carta baixada":"cartas baixadas"}. Restam ${standing().length}.</p>`,`<button class="btn" data-act="ask">Outra pergunta</button><button class="btn primary" data-act="close">Voltar ao tabuleiro</button>`);
+    return;
+  }
+  openDialog("Qual foi a resposta?",`<p class="answer-q">${esc(curQ.label)}</p>
+    <div class="answers"><button class="btn" data-act="ans" data-v="1">Sim<small>baixa ${no}</small></button><button class="btn" data-act="ans" data-v="0">Não<small>baixa ${yes}</small></button></div>
+    <p class="muted">As cartas que não combinam com a resposta vão baixar sozinhas.</p>`,`<button class="btn ghost" data-act="ask">← Escolher outra</button>`);
+}
+function applyAnswer(q,ans){
+  const toDown=standing().filter(id=>q.test(char(id))!==ans);
+  S.down.push(...toDown);S.asked++;save();render();
+  return toDown.length;
+}
+function openDetails(){
+  const c=char(S.secret),p=pack();
+  openDialog("Seu personagem",`<div class="big-portrait" style="--pack-bg:${p.bg}"><div class="pf">${avatar(c)}</div><div><h3>${esc(c.name)}</h3><p class="muted">Use esta ficha para responder as perguntas. Não mostre para o oponente.</p></div></div>
+  <dl class="traits">${traitRows(c).map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl>`,`<button class="btn primary" data-act="close">Fechar</button>`);
+}
+function guess(id){
+  const c=char(id),ai=char(S.ai);
+  if(id===S.ai){
+    S.guessing=false;save();render();
+    openDialog("Acertou!",`<div class="big-portrait" style="--pack-bg:${pack().bg}"><div class="pf">${avatar(ai)}</div><div><h3>${esc(ai.name)}</h3><p class="muted">Você descobriu com ${S.asked} ${S.asked===1?"pergunta":"perguntas"}.</p></div></div>`,`<button class="btn" data-act="home">Início</button><button class="btn primary" data-act="newsolo">Novo treino</button>`);
+  }else{
+    S.down.push(id);S.asked++;S.guessing=false;save();render();
+    toast(`Não é ${c.name}. Conta como mais uma pergunta.`);
+  }
+}
+
+/* ============================ EVENTOS ============================ */
+function onClick(e){
+  const b=e.target.closest("[data-act]");if(!b)return;
+  const act=b.dataset.act;
+  switch(act){
+    case "tray":S.tray=b.dataset.v;save();render();break;
+    case "pack":S.packId=b.dataset.id;save();render();break;
+    case "create":startGame("duo",newCode(pack()));toast("Passe o código "+S.code+" para quem vai jogar com você");break;
+    case "solo":startGame("solo",newCode(pack()));break;
+    case "newsolo":closeDialog();S.code=newCode(pack());S.round=1;buildRound();break;
+    case "home":closeDialog();S.screen="home";save();render();break;
+    case "copy":{const t=S.code;
+      const sel=()=>{const el=document.getElementById("codeText");const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);toast("Código selecionado. Copie com Ctrl+C ou segurando o dedo.")};
+      try{navigator.clipboard.writeText(t).then(()=>toast("Código copiado"),sel)}catch(err){sel()}break;}
+    case "newround":openDialog("Começar a rodada "+(S.round+1)+"?",`<p>O tabuleiro muda e você recebe um novo personagem secreto. A outra pessoa também precisa tocar em <b>Nova rodada</b> para os tabuleiros continuarem iguais.</p>`,`<button class="btn ghost" data-act="close">Cancelar</button><button class="btn primary" data-act="confirmround">Começar rodada ${S.round+1}</button>`);break;
+    case "confirmround":closeDialog();S.round++;buildRound();toast("Rodada "+S.round);break;
+    case "reveal":S.reveal=!S.reveal;save();render();if(S.reveal){clearTimeout(revealT);revealT=setTimeout(()=>{if(S.reveal){S.reveal=false;save();render()}},5000)}break;
+    case "details":openDetails();break;
+    case "ask":openAsk();break;
+    case "q":pickQuestion(b.dataset.k);break;
+    case "ans":{const n=applyAnswer(curQ,b.dataset.v==="1");closeDialog();toast(`${n} ${n===1?"carta baixada":"cartas baixadas"} · restam ${standing().length}`);break;}
+    case "guess":S.guessing=!S.guessing;save();render();break;
+    case "card":{const id=b.dataset.id,i=S.down.indexOf(id);
+      if(S.mode==="solo"&&S.guessing){if(i<0)guess(id);break;}
+      if(i>=0)S.down.splice(i,1);else S.down.push(id);save();render();break;}
+    case "pt":S.score[b.dataset.v]++;save();render();break;
+    case "resetscore":S.score.me=0;S.score.them=0;save();render();break;
+    case "close":closeDialog();break;
+  }
+}
+let revealT;
+document.addEventListener("click",e=>{if(e.target===dlg){closeDialog();return}onClick(e)});
+document.addEventListener("submit",e=>{
+  if(e.target.id!=="joinForm")return;
+  e.preventDefault();
+  const v=document.getElementById("codeInput").value,parsed=parseCode(v),err=document.getElementById("joinErr");
+  if(!parsed){err.textContent="Código inválido. Ele tem 3 letras da extensão e 4 caracteres, como LOL-K7Q2.";return}
+  startGame("duo",parsed.code);toast("Entrou na partida "+parsed.code+" · "+parsed.pack.name);
+});
+document.addEventListener("input",e=>{
+  if(e.target.id==="qsearch"){
+    const t=e.target.value.trim().toLowerCase();
+    dlg.querySelectorAll(".q").forEach(q=>{q.hidden=t&&!q.textContent.toLowerCase().includes(t)});
+    dlg.querySelectorAll(".qgroup").forEach(g=>{g.hidden=![...g.querySelectorAll(".q")].some(q=>!q.hidden)});
+  }
+  if(e.target.id==="meName"||e.target.id==="themName"){S.score[e.target.id]=e.target.value.slice(0,12);save()}
+});
+
+/* ============================ INÍCIO ============================ */
+function start(data){
+  const saved=(data&&data.S)||store.get();
+  S=Object.assign(fresh(),saved||{});
+  S.score=Object.assign(fresh().score,S.score||{});
+  if(S.screen==="game"&&(!S.board.length||!pack().byId[S.secret])) S.screen="home";
+  render();
+}
+window.claude?.hot?.snapshot?.(()=>({S}));
+window.claude?.hot?.ready?window.claude.hot.ready(start):start(window.claude?.hot?.data??{});
+</script>
+
+</body>
+</html>
